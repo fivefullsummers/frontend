@@ -39,20 +39,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Build application
+      - name: Create Docker deployment package
         run: |
-          npm install
-          npm run build
-
-      - name: Create deployment package
-        run: |
-          cd build
-          zip -r ../deploy.zip .
+          # Create a deployment package with your Dockerfile and source code
+          zip -r deploy.zip . -x "node_modules/*" ".git/*" "*.md" "Dockerfile.dev" "docker-compose*" "build/*"
 
       - name: Upload to S3
         run: |
