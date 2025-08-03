@@ -39,22 +39,27 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
       - name: Build application
         run: |
-          npm ci
+          npm install
           npm run build
 
       - name: Create deployment package
         run: |
           cd build
-          zip -r ../build.zip .
+          zip -r ../deploy.zip .
 
       - name: Deploy to Elastic Beanstalk
         run: |
           aws elasticbeanstalk create-application-version \
             --application-name ${{ secrets.AWS_EB_APPLICATION_NAME }} \
             --version-label ${{ github.sha }} \
-            --source-bundle S3Bucket=${{ secrets.AWS_EB_BUCKET }}, S3Key=deploy.zip \
+            --source-bundle S3Bucket=${{ secrets.AWS_EB_BUCKET }},S3Key=deploy.zip \
             --auto-create-application-version
 
           aws elasticbeanstalk update-environment \
